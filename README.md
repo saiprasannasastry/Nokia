@@ -64,5 +64,5 @@ grpc and grpc gateway was used to solve the above problem
 - curl -X DELETE http://localhost:8080/photo/($ID)
   - The photo you want to delete directly, the album id is not requred
   
-  
+  # THE Second contributor is me as well, my mac changed the email id hence it shows that way, but the only contribution that was done by that account was change the README
 
