@@ -46,8 +46,11 @@ func startGRPC(db *gorm.DB) {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	grpcServer := grpc.NewServer()
-	srv := svc.NewAlbumServer(db)
+
+	producer := setKafka()
+	srv := svc.NewAlbumServer(db, producer)
 	albumgpb.RegisterAlbumServiceServer(grpcServer, srv)
+
 	log.Println("gRPC server ready...")
 	grpcServer.Serve(lis)
 }
@@ -85,46 +88,28 @@ func startHTTP() {
 	}
 }
 
+func setKafka() sarama.SyncProducer {
+	config := sarama.NewConfig()
+	config.Producer.RequiredAcks = sarama.WaitForAll
+	config.Producer.Retry.Max = 5
+	config.Producer.Return.Successes = true
+
+	brokers := []string{"kafka:9092"}
+	producer, err := sarama.NewSyncProducer(brokers, config)
+	if err != nil {
+		// Should not reach here
+		panic(err)
+	}
+	return producer
+
+}
 func logRequest(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-
-		config := sarama.NewConfig()
-		config.Producer.RequiredAcks = sarama.WaitForAll
-		config.Producer.Retry.Max = 5
-		config.Producer.Return.Successes = true
-
-		brokers := []string{"kafka:9092"}
-		producer, err := sarama.NewSyncProducer(brokers, config)
-		if err != nil {
-			// Should not reach here
-			panic(err)
-		}
-
-		defer func() {
-			if err := producer.Close(); err != nil {
-				// Should not reach here
-				panic(err)
-			}
-		}()
-
-		topic := "test"
-		message := fmt.Sprintf("sending method:%v and url %v", r.Method, r.URL)
-		msg := &sarama.ProducerMessage{
-			Topic: topic,
-			Value: sarama.StringEncoder(message),
-		}
-
-		partition, offset, err := producer.SendMessage(msg)
-		if err != nil {
-			panic(err)
-		}
-
-		log.Infof("Message is stored in topic(%s)/partition(%d)/offset(%d)\n", topic, partition, offset)
-
 		log.Printf("%s %s %s\n", r.RemoteAddr, r.Method, r.URL)
 		handler.ServeHTTP(w, r)
 	})
 }
+
 func serveSwagger(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "www/swagger.json")
 }

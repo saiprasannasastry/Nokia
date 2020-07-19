@@ -14,11 +14,13 @@ import (
 	"google.golang.org/grpc/status"
 
 	albumgpb "github.com/Nokia/proto"
+	"github.com/Shopify/sarama"
 )
 
 //AlbumServiceServer returns an instance of db and grpc server
 type AlbumServiceServer struct {
-	db *gorm.DB
+	db    *gorm.DB
+	kafka sarama.SyncProducer
 }
 
 //Album maps the fields present in postgres
@@ -31,8 +33,24 @@ type Album struct {
 }
 
 //NewAlbumServer returns an instance of AlbumServiceServer
-func NewAlbumServer(db *gorm.DB) albumgpb.AlbumServiceServer {
-	return &AlbumServiceServer{db: db}
+func NewAlbumServer(db *gorm.DB, kafka sarama.SyncProducer) albumgpb.AlbumServiceServer {
+	return &AlbumServiceServer{db: db, kafka: kafka}
+}
+
+func (a *AlbumServiceServer) publishKafka(value string) {
+
+	topic := "test"
+	msg := &sarama.ProducerMessage{
+		Topic: topic,
+		Value: sarama.StringEncoder(value),
+	}
+
+	partition, offset, err := a.kafka.SendMessage(msg)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Infof("Message is stored in topic(%s)/partition(%d)/offset(%d)\n", topic, partition, offset)
 }
 
 //CreateAlbum creates a photo with the given id and returns error if same id is present
@@ -55,6 +73,9 @@ func (a *AlbumServiceServer) CreateAlbum(ctx context.Context, in *albumgpb.Album
 	tx.Commit()
 	log.Infof("succesfully added Photo with id:%v and title:%v into the database", photo.Id, photo.Title)
 
+	message := fmt.Sprintf("method:POST request received with value %+v", photo)
+	a.publishKafka(message)
+
 	return &albumgpb.CreateAlbumResponse{Message: "Succesfully added photo into DB"}, nil
 }
 
@@ -74,7 +95,7 @@ func (a *AlbumServiceServer) GetAlbums(test *empty.Empty, in albumgpb.AlbumServi
 			log.Infof("Error scanning rows")
 			return err
 		}
-		log.Infof("The albums sent to client are %+v", album)
+		log.Infof("The album sent to client are %+v", album)
 		in.Send(&albumgpb.Albumreq{
 			Album: &albumgpb.Photo{
 				Id:           int64(album.Id),
@@ -85,6 +106,9 @@ func (a *AlbumServiceServer) GetAlbums(test *empty.Empty, in albumgpb.AlbumServi
 			},
 		})
 	}
+	msg := fmt.Sprintf("method:GET request received to send all albums ")
+	a.publishKafka(msg)
+
 	return nil
 }
 
@@ -108,7 +132,7 @@ func (a *AlbumServiceServer) GetAlbum(in *albumgpb.GetAlbumreqParams, stream alb
 			log.Errorf(msg)
 			return st.Err()
 		}
-		log.Infof("The particular album sent is %+v", album)
+
 		stream.Send(&albumgpb.Albumreq{
 			Album: &albumgpb.Photo{
 				Id:           int64(album.Id),
@@ -119,6 +143,10 @@ func (a *AlbumServiceServer) GetAlbum(in *albumgpb.GetAlbumreqParams, stream alb
 			},
 		})
 	}
+	log.Infof("The particular album sent is %+v", int(in.AlbumId))
+	msg := fmt.Sprintf("method:GET request received to send  album with id %v", int(in.AlbumId))
+	a.publishKafka(msg)
+
 	return nil
 }
 
@@ -136,6 +164,9 @@ func (a *AlbumServiceServer) GetPhoto(ctx context.Context, in *albumgpb.Getphoto
 		log.Errorf(msg)
 		return nil, st.Err()
 	}
+	msg := fmt.Sprintf("method:GET request received to send  album with id:%v and photo id:%v", int(in.AlbumId), int(in.PhotoId))
+	a.publishKafka(msg)
+
 	return &albumgpb.Photo{Id: int64(album.Id),
 			AlbumId:      int64(album.Albumid),
 			Title:        album.Title,
@@ -173,6 +204,10 @@ func (a *AlbumServiceServer) UpdatePhoto(ctx context.Context, in *albumgpb.Updat
 		return nil, st.Err()
 	}
 	tx.Commit()
+
+	msg := fmt.Sprintf("method:PUT request received ")
+	a.publishKafka(msg)
+
 	return new(empty.Empty), nil
 }
 
@@ -195,5 +230,9 @@ func (a *AlbumServiceServer) DeleteAlbum(ctx context.Context, in *albumgpb.Delet
 		return nil, err
 	}
 	tx.Commit()
+
+	msg := fmt.Sprintf("method:DELETE request received  to delete photo with id:%v", int(in.PhotoId))
+	a.publishKafka(msg)
+
 	return new(empty.Empty), nil
 }
