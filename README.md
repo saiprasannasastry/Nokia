@@ -7,11 +7,11 @@ grpc and grpc gateway was used to solve the above problem
 - Message Queue used kafka
 - container technology used docker
 - The consumer container was just created to see catch the messages and show the logs
-- To play around just run make build: This will build/ pull all the images and get the setup ready to run http calls
 - Try the calls in any order and you should see appropriate error/success
 - The main code is in cmd/server folder
 - consumer panics until it is able to connect to kafka. But this wont affect any calls you do because it would have connected to kafka container by then
 
+## To play around just run `make build` : This will build/ pull all the images and get the setup ready to run http calls
 ## TASKS
 - Create/Delete Image Album using REST API
 - Create/Delete Image in an Album using REST API
