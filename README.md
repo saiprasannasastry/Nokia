@@ -10,6 +10,7 @@ grpc and grpc gateway was used to solve the above problem
 - To play around just run make build: This will build/ pull all the images and get the setup ready to run http calls
 - Try the calls in any order and you should see appropriate error/success
 - The main code is in cmd/server folder
+- consumer panics until it is able to connect to kafka. But this wont affect any calls you do because it would have connected to kafka container by then
 
 ## TASKS
 - Create/Delete Image Album using REST API
