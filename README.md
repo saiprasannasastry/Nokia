@@ -40,7 +40,7 @@ The design for API was taken using [jsonplaceholder.typicode.com/photos](jsonpla
    - logs of each container can be accessed using `docker logs -f $container name`
   - To bring down the container run `make clean`
     - This brings down the containers and cleans all the volumes and images
-    - If you wish to keep the volumes and images for next trail , navigate to docker folder and run `docker-compose down`
+    - If you wish to keep the volumes and images for next trail , navigate to `docker` folder and run `docker-compose down`
   - Swaager UI is not working
   - for swagger.json check www folder
   - protocompile was used to generate swagger.json
