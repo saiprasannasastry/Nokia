@@ -7,7 +7,7 @@
 - Produce notification message to a topic whenever Create/Delete image using message broker like Kafka
 
 ## PREREQUISITES
-- git , to clone the repo
+- git  to clone the repo
 - Docker
 - Internet connection( to pull kafka, zookeeper, golang, postgres)
 
