@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+package service;
+option go_package = ".;albumgpb";
+
+message Photo {
+    int64 id = 1;
+    int64 albumId = 2;
+    string title = 3;
+    string url =4;
+    string thumbNailUrl =5;
+}
+
+message Albumreq {
+    Photo album = 1;
+}
+
+message UpdatePhotoReq{
+    int64 oldAlbumId =1;
+    int64 newAlbumId =2;
+    string oldTitle =3;
+    string newTitle =4;
+}
+message UpdatePhotoResponse{
+    bool success=1;
+}
+message ListAlbumResponse {
+    Photo album = 1;
+}
+message GetAlbumreqParams{
+    int64 albumId =1;
+}
+message DeleteReq{
+    int64 photoId=1;
+}
+message GetphotoReq{
+    int64 albumId =1;
+    int64 photoId =2;
+}
+
+message CreateAlbumResponse {
+    string message =1;
+}
+service AlbumService{
+
+rpc CreateAlbum(Albumreq) returns (CreateAlbumResponse){
+option (google.api.http) = {
+      post: "/album"
+      body: "album"
+    };
+}
+//Get all albums
+rpc GetAlbums(google.protobuf.Empty) returns (stream Albumreq){
+    option (google.api.http) = {
+      get: "/getalbums"
+    };
+}
+//Get album by id
+rpc GetAlbum(GetAlbumreqParams) returns (stream Albumreq){
+    option (google.api.http) = {
+      get: "/getalbums/{albumId}"
+    };
+}
+//Get photo after selecting the album
+rpc GetPhoto(GetphotoReq) returns(Photo){
+        option (google.api.http) = {
+      get: "/getalbums/{albumId}/photo/{photoId}"
+    };
+}
+
+rpc UpdatePhoto(UpdatePhotoReq) returns ( google.protobuf.Empty){
+    option (google.api.http) = {
+      put: "/updatealbum"
+        body:"*"
+    };  
+}
+rpc DeleteAlbum(DeleteReq) returns (google.protobuf.Empty){
+    option (google.api.http) = {
+      delete: "/photo/{photoId}"
+    }; 
+}
+
+}

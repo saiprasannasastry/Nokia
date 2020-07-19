@@ -1,0 +1,70 @@
+version: '3'
+services:
+  app:
+    container_name: photo
+    image: ssastry22/atlas-repo:photo
+    ports: 
+      - 8080:8080 
+      - 5566:5566
+    restart: on-failure
+    volumes:
+      - api:/usr/src/app/
+    depends_on:
+      - fullstack-postgres  
+      - kafka        
+    networks:
+      - fullstack
+    environment:
+      - DB_HOST
+      - DB_USER
+      - DB_PASSWORD
+      - DB_NAME
+      - DB_PORT
+    
+  fullstack-postgres:
+    image: ssastry22/atlas-repo:psql
+    container_name: postgres-db
+    ports:
+      - '5432:5432'
+    volumes:
+      - database_postgres:/var/lib/postgresql/data
+    networks:
+      - fullstack
+
+  zookeeper:
+    container_name: zookeeper
+    image: wurstmeister/zookeeper
+    networks:
+      - fullstack
+ 
+  kafka:
+    container_name: kafka
+    image: wurstmeister/kafka
+    ports:
+      - 9092:9092
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+    networks:
+      - fullstack
+
+  consumer:
+    container_name: consumer
+    ports:
+      - 8010:8080
+    restart: on-failure
+    image: ssastry22/atlas-repo:consumer
+    depends_on:
+      - kafka
+    networks:
+      - fullstack
+
+volumes:
+  api:
+  database_postgres:  
+  consumer:                
+
+# Networks to be created to facilitate communication between containers
+networks:
+  fullstack:
+    driver: bridge
