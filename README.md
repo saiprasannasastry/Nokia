@@ -13,7 +13,7 @@
 
 ## DESCRIPTION
 The design for API was taken using [jsonplaceholder.typicode.com/photos](jsonplaceholder.typicode.com/photos).
-grpc and grpc gateway was used to solve the above problem
+- grpc and grpc gateway was used to solve the above problem
 - Databse used postgres
 - Message Queue used kafka
 - container technology used docker
@@ -29,6 +29,7 @@ grpc and grpc gateway was used to solve the above problem
 
   ## NOTE
   - except albumID everything has to be unique otherwise you will get "ALREADY_EXISTS" error. This makes sense because the photo id and title always has to be uniqe as well the URL
+  - The supported calls are below, the endpoints are generated using `protoc`
   - You can see error logs in server using `docker logs -f photo`
   - The container names are as follows
     - `PHOTO` main container
@@ -58,7 +59,7 @@ grpc and grpc gateway was used to solve the above problem
 - Curl -X GET "http://localhost:8080/getalbums/$(ALBUMID)/photo/$(PHOTOID)"
   - The above call gets a particular photo from the corresponding Album id. Replace the variables with appropriate values
      
-- Curl -X PUT "http://localhost:8080/Updatealbum" -d '{"oldAlbumId":2,"newAlbumId":4,"oldTitle":"bleh", "newTitle":"sai1"}'
+- Curl -X PUT "http://localhost:8080/updatealbum" -d '{"oldAlbumId":2,"newAlbumId":4,"oldTitle":"bleh", "newTitle":"sai1"}'
   - The above method was implemented keeping in mind if the the photo had to be moved from x to y
   
 - curl -X DELETE http://localhost:8080/photo/($ID)
