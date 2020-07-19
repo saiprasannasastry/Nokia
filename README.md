@@ -9,6 +9,7 @@ grpc and grpc gateway was used to solve the above problem
 - The consumer container was just created to see catch the messages and show the logs
 - To play around just run make build: This will build/ pull all the images and get the setup ready to run http calls
 - Try the calls in any order and you should see appropriate error/success
+- The main code is in cmd/server folder
 
 ## TASKS
 - Create/Delete Image Album using REST API
