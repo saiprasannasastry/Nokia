@@ -74,7 +74,7 @@ func (a *AlbumServiceServer) GetAlbums(test *empty.Empty, in albumgpb.AlbumServi
 			log.Infof("Error scanning rows")
 			return err
 		}
-		log.Infof("sent %+v", album)
+		log.Infof("The albums sent to client are %+v", album)
 		in.Send(&albumgpb.Albumreq{
 			Album: &albumgpb.Photo{
 				Id:           int64(album.Id),
@@ -108,7 +108,7 @@ func (a *AlbumServiceServer) GetAlbum(in *albumgpb.GetAlbumreqParams, stream alb
 			log.Errorf(msg)
 			return st.Err()
 		}
-		log.Infof("sent %+v", album)
+		log.Infof("The particular album sent is %+v", album)
 		stream.Send(&albumgpb.Albumreq{
 			Album: &albumgpb.Photo{
 				Id:           int64(album.Id),
