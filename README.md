@@ -39,3 +39,4 @@ grpc and grpc gateway was used to solve the above problem
   ## NOTE
   - Swaager UI is not working
   - for swagger.json check www folder
+  - protocompile was used to generate swagger.json
