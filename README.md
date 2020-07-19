@@ -7,6 +7,7 @@
 - Produce notification message to a topic whenever Create/Delete image using message broker like Kafka
 
 ## PREREQUISITES
+- git , to clone the repo
 - Docker
 - Internet connection( to pull kafka, zookeeper, golang, postgres)
 
@@ -24,7 +25,7 @@ grpc and grpc gateway was used to solve the above problem
   - if you wish to clean up the ports run `lsof -i tcp:$PORT` and then kill the port using PID `kill $PID` . Use this command if your bringing up the environment on mac
   - for ubunutu  run `netstat -anp|grep "$PORT"` then kill the port using PID `kill $PID` 
 
-## To play around just run `make build` : This will build/ pull all the images and get the setup ready to run http calls
+## To play around just clone this repo `git clone https://github.com/saiprasannasastry/Nokia.git` run `make build` : This will build/ pull all the images and get the setup ready to run http calls
 
   ## NOTE
   - except albumID everything has to be unique otherwise you will get "ALREADY_EXISTS" error. This makes sense because the photo id and title always has to be uniqe as well the URL
