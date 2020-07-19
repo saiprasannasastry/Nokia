@@ -43,6 +43,15 @@ grpc and grpc gateway was used to solve the above problem
   - The photo you want to delete directly, the album id is not requred
   
   ## NOTE
+  - except albumID everything has to be unique otherwise you will get "ALREADY_EXISTS" error
+  - You can see error logs in server `docker logs -f photo`
+  - The container names are as follows
+    - `PHOTO` main container
+    - `postgres-db` DB container
+    - `consumer` Kafka consumer
+    - `kafka` kafka container
+    - `zookerper` zooker container
+   - logs of each container can be accessed using `docker logs -f $container name`
   - Swaager UI is not working
   - for swagger.json check www folder
   - protocompile was used to generate swagger.json
