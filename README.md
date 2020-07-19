@@ -7,8 +7,14 @@ grpc and grpc gateway was used to solve the above problem
 - Message Queue used kafka
 - container technology used docker
 - The consumer container was just created to see catch the messages and show the logs
+- Try the calls in any order and you should see appropriate error/success
+- The main code is in cmd/server folder
+- consumer panics until it is able to connect to kafka. But this wont affect any calls you do because it would have connected to kafka container by then
+- make sure port 8080, 5432, 8010,9092,5566 are not in use in your local system. 
+  - if you wish to clean up the ports run `lsof -i tcp:$PORT` and then kill the port using PID `kill $PID` . Use this command if your bringing up the environment on mac
+  - for ubunutu  run `netstat -anp|grep "$PORT"` then kill the port using PID `kill $PID` 
 
-- To play around just run make build: This will build/ pull all the images and get the setup ready to run http calls
+## To play around just run `make build` : This will build/ pull all the images and get the setup ready to run http calls
 
 ## TASKS
 - Create/Delete Image Album using REST API
@@ -39,3 +45,4 @@ grpc and grpc gateway was used to solve the above problem
   ## NOTE
   - Swaager UI is not working
   - for swagger.json check www folder
+  - protocompile was used to generate swagger.json
